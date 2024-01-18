@@ -9,7 +9,10 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.67.0 // indirect
 	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/mux v1.6.2 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/sessions v1.2.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
