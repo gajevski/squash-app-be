@@ -1,8 +1,10 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -16,5 +18,8 @@ var oauth2Config = &oauth2.Config{
 }
 
 func main() {
-
+	r := mux.NewRouter()
+	r.HandleFunc("/login", loginHandler)
+	r.HandleFunc("/callback", callbackHandler)
+	http.ListenAndServe(":8080", r)
 }
