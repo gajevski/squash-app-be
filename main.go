@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
 )
@@ -25,6 +26,16 @@ func main() {
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/callback", callbackHandler)
 	http.ListenAndServe(":8080", r)
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:4200"}, // Replace with your frontend's URL
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders: []string{"Authorization", "Content-Type"},
+	})
+
+	handler := c.Handler(r)
+
+	http.ListenAndServe(":8080", handler)
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
