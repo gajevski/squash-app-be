@@ -47,7 +47,7 @@ func main() {
 	http.ListenAndServe(":8080", r)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:4200"},
+		AllowedOrigins: []string{os.Getenv("ALLOWED_ORIGINS")},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Authorization", "Content-Type"},
 	})
