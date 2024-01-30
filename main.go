@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -23,8 +24,10 @@ type JSONResponse struct {
 }
 
 type User struct {
-	ID       string
-	Username string
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Image    string `json:"image"`
+	Racket   string `json:"racket"`
 }
 
 var oauth2Config = &oauth2.Config{
@@ -39,22 +42,24 @@ var jwtKey = []byte(os.Getenv("JWT_KEY"))
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
+
 	r := mux.NewRouter()
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/callback", callbackHandler)
-	http.ListenAndServe(":8080", r)
+	r.HandleFunc("/api/user", userHandler)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{os.Getenv("ALLOWED_ORIGINS")},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
-		AllowedHeaders: []string{"Authorization", "Content-Type"},
+		AllowedOrigins:   []string{"http://localhost:4200"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
 	})
 
 	handler := c.Handler(r)
 
-	http.ListenAndServe(":8080", handler)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,31 +77,47 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	token, err := oauth2Config.Exchange(context.Background(), code)
 	if err != nil {
-		http.Error(w, "Failed to exchange token: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("Error exchanging token: %v", err)
+		http.Error(w, "Failed to exchange token", http.StatusInternalServerError)
 		return
 	}
 
 	client := oauth2Config.Client(context.Background(), token)
 	userResponse, err := client.Get("https://api.github.com/user")
 	if err != nil {
-		http.Error(w, "Failed to get user info: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("Error getting user info: %v", err)
+		http.Error(w, "Failed to get user info", http.StatusInternalServerError)
 		return
 	}
 	defer userResponse.Body.Close()
 
 	var user User
 	if err := json.NewDecoder(userResponse.Body).Decode(&user); err != nil {
-		http.Error(w, "Failed to decode user info: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("Error decoding user info: %v", err)
+		http.Error(w, "Failed to decode user info", http.StatusInternalServerError)
 		return
 	}
 
 	jwtToken, err := generateToken(user)
 	if err != nil {
-		http.Error(w, "Failed to generate token: "+err.Error(), http.StatusInternalServerError)
+		log.Printf("Error generating JWT token: %v", err)
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
 		return
 	}
 
 	json.NewEncoder(w).Encode(map[string]string{"token": jwtToken})
+}
+
+func userHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	user := User{
+		Username: "Mikolaj",
+		ID:       1,
+		Image:    "https://avatars.githubusercontent.com/u/29663156?v=4",
+		Racket:   "Wilson Hyper Hammer 120",
+	}
+	json.NewEncoder(w).Encode(user)
 }
 
 func jsonResponse(w http.ResponseWriter, success bool, message string, data interface{}, statusCode int) {
@@ -113,7 +134,7 @@ func generateToken(user User) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 
 	claims := &jwt.StandardClaims{
-		Subject:   user.ID,
+		Subject:   strconv.FormatInt(user.ID, 10),
 		ExpiresAt: expirationTime.Unix(),
 	}
 
