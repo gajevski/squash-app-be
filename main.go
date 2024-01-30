@@ -30,20 +30,25 @@ type User struct {
 	Racket   string `json:"racket"`
 }
 
-var oauth2Config = &oauth2.Config{
-	ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
-	ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
-	RedirectURL:  os.Getenv("CALLBACK_REDIRECT"),
-	Scopes:       []string{"read:user"},
-	Endpoint:     github.Endpoint,
-}
-var jwtKey = []byte(os.Getenv("JWT_KEY"))
+var (
+	oauth2Config *oauth2.Config
+	jwtKey       []byte
+)
 
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("Error loading .env file")
+		log.Fatal("Error loading .env file")
 	}
+
+	oauth2Config = &oauth2.Config{
+		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
+		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("CALLBACK_REDIRECT"),
+		Scopes:       []string{"read:user"},
+		Endpoint:     github.Endpoint,
+	}
+	jwtKey = []byte(os.Getenv("JWT_KEY"))
 
 	r := mux.NewRouter()
 	r.HandleFunc("/login", loginHandler)
