@@ -27,7 +27,13 @@ type User struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Image    string `json:"image"`
-	Racket   string `json:"racket"`
+	Racket   Racket `json:"racket"`
+}
+
+type Racket struct {
+	Name         string `json:"name"`
+	Image        string `json:"image"`
+	PurchaseDate string `json:"purchaseDate"`
 }
 
 var (
@@ -120,7 +126,11 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		Username: "Mikolaj",
 		ID:       1,
 		Image:    "https://avatars.githubusercontent.com/u/29663156?v=4",
-		Racket:   "Wilson Hyper Hammer 120",
+		Racket: Racket{
+			Name:         "Wilson Hyper Hammer 120",
+			Image:        "https://www.squashtime.pl/images/thumbs/640_720/WRT967700_wilson_01.jpg",
+			PurchaseDate: "October 2023",
+		},
 	}
 	json.NewEncoder(w).Encode(user)
 }
