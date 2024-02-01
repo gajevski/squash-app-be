@@ -31,9 +31,12 @@ type User struct {
 }
 
 type Racket struct {
-	Name         string `json:"name"`
-	Image        string `json:"image"`
-	PurchaseDate string `json:"purchaseDate"`
+	Name                string `json:"name"`
+	Image               string `json:"image"`
+	PurchaseDate        string `json:"purchaseDate"`
+	PlayedMatchesAmount int    `json:"playedMatchesAmount"`
+	Grip                string `json:"grip"`
+	String              string `json:"string"`
 }
 
 var (
@@ -127,9 +130,12 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		ID:       1,
 		Image:    "https://avatars.githubusercontent.com/u/29663156?v=4",
 		Racket: Racket{
-			Name:         "Wilson Hyper Hammer 120",
-			Image:        "https://www.squashtime.pl/images/thumbs/640_720/WRT967700_wilson_01.jpg",
-			PurchaseDate: "October 2023",
+			Name:                "Wilson Hyper Hammer 120",
+			Image:               "https://www.squashtime.pl/images/thumbs/640_720/WRT967700_wilson_01.jpg",
+			PurchaseDate:        "October 2023",
+			PlayedMatchesAmount: 26,
+			Grip:                "Toalson Ultra Grip 3Pack Black",
+			String:              "Default",
 		},
 	}
 	json.NewEncoder(w).Encode(user)
