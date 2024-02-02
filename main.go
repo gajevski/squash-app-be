@@ -24,10 +24,11 @@ type JSONResponse struct {
 }
 
 type User struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Image    string `json:"image"`
-	Racket   Racket `json:"racket"`
+	ID         int64      `json:"id"`
+	Username   string     `json:"username"`
+	Image      string     `json:"image"`
+	Racket     Racket     `json:"racket"`
+	Statistics Statistics `json:"statistics"`
 }
 
 type Racket struct {
@@ -37,6 +38,13 @@ type Racket struct {
 	PlayedMatchesAmount int    `json:"playedMatchesAmount"`
 	Grip                string `json:"grip"`
 	String              string `json:"string"`
+}
+
+type Statistics struct {
+	MatchesPlayed int `json:"matchesPlayed"`
+	MatchesWon    int `json:"matchesWon"`
+	MatchesLost   int `json:"matchesLost"`
+	Winratio      int `json:"winratio"`
 }
 
 var (
@@ -125,6 +133,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 func userHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	matchesWon := 10
+	matchesLost := 5
+	totalMatches := matchesWon + matchesLost
+	winratio := (float64(matchesWon) / float64(totalMatches)) * 100
+
 	user := User{
 		Username: "Mikolaj",
 		ID:       1,
@@ -136,6 +149,12 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			PlayedMatchesAmount: 26,
 			Grip:                "Toalson Ultra Grip 3Pack Black",
 			String:              "Default",
+		},
+		Statistics: Statistics{
+			MatchesPlayed: totalMatches,
+			MatchesWon:    matchesWon,
+			MatchesLost:   matchesLost,
+			Winratio:      int(winratio),
 		},
 	}
 	json.NewEncoder(w).Encode(user)
