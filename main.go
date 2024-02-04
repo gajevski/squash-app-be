@@ -49,6 +49,7 @@ type Statistics struct {
 }
 
 type Activity struct {
+	Id           int    `json:"id"`
 	ActivityName string `json:"activityName"`
 	Date         string `json:"date"`
 }
@@ -163,8 +164,8 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			Winratio:      int(winratio),
 		},
 		Activities: []Activity{
-			{ActivityName: "Squash Match", Date: "2023-10-01"},
-			{ActivityName: "Training Session", Date: "2023-10-02"},
+			{Id: 1, ActivityName: "Squash Match", Date: "2023-10-01"},
+			{Id: 2, ActivityName: "Training Session", Date: "2023-10-02"},
 		},
 	}
 	json.NewEncoder(w).Encode(user)
