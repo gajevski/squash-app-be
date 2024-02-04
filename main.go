@@ -29,15 +29,16 @@ type User struct {
 	Image      string     `json:"image"`
 	Racket     Racket     `json:"racket"`
 	Statistics Statistics `json:"statistics"`
+	Activities []Activity `json:"activities"`
 }
 
 type Racket struct {
 	Name                string `json:"name"`
 	Image               string `json:"image"`
 	PurchaseDate        string `json:"purchaseDate"`
-	PlayedMatchesAmount int    `json:"playedMatchesAmount"`
 	Grip                string `json:"grip"`
 	String              string `json:"string"`
+	PlayedMatchesAmount int    `json:"playedMatchesAmount"`
 }
 
 type Statistics struct {
@@ -45,6 +46,11 @@ type Statistics struct {
 	MatchesWon    int `json:"matchesWon"`
 	MatchesLost   int `json:"matchesLost"`
 	Winratio      int `json:"winratio"`
+}
+
+type Activity struct {
+	ActivityName string `json:"activityName"`
+	Date         string `json:"date"`
 }
 
 var (
@@ -155,6 +161,10 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			MatchesWon:    matchesWon,
 			MatchesLost:   matchesLost,
 			Winratio:      int(winratio),
+		},
+		Activities: []Activity{
+			{ActivityName: "Squash Match", Date: "2023-10-01"},
+			{ActivityName: "Training Session", Date: "2023-10-02"},
 		},
 	}
 	json.NewEncoder(w).Encode(user)
